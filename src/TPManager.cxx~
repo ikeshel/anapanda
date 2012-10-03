@@ -1,0 +1,128 @@
+
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+// author: i.keshelashvili@unibas.ch                                    //
+//                                                                      //
+//                                                                      //
+//////////////////////////////////////////////////////////////////////////
+
+#include "TPManager.hh"
+
+ClassImp( TPManager )
+
+//-----------------------------------------------
+TPManager::TPManager()
+{
+  printf(" *************************************************\n"
+	 " *                                               *\n"
+	 " *                                               *\n"
+	 " *                                               *\n"
+	 " *                                               *\n"
+	 " *************************************************\n");
+
+  fNBurst = 2;
+
+  fTimer = new TTimer(1);
+  fTimer->Connect("Timeout()", "TPManager", this, "Next()");
+
+  cMain = new TCanvas("cMain","Main Canvas", 0, 0, 1000, 800);
+  cMain->Divide(3, 3, .001, .001);
+
+  //
+  //
+  fSigExt_PMT = new TPSignalExtractor();
+
+  //
+  //
+  fSigExt_AMP = new TPSignalExtractor();
+
+  //
+  //
+  fSigExt_SHP = new TPSignalExtractor();
+
+}
+
+//-----------------------------------------------
+TPManager::~TPManager()
+{  
+  
+}
+
+//-----------------------------------------------
+void TPManager::DoStart(int interval=1)
+{  
+  fTimer->Start(interval);
+  Info("DoStart()", "-done");
+  return;
+}
+
+//-----------------------------------------------
+void TPManager::DoStop()
+{  
+  fTimer->Stop();
+  Info("DoStop()", "-done");
+  return;
+}
+
+//-----------------------------------------------
+void TPManager::DoEvent(int ev)
+{  
+  fCurrEvt = ev;
+
+  if( fCurrEvt > fTotaEvt )
+    DoStop();
+  
+  for(int i=0; i<fNChannel; i++)
+    fhSignal[i] = GetProjection(i, fCurrEvt);
+
+  //
+  //
+  fSigExt_PMT->FindHits(hProj[0], 3000);
+  
+  DrawAll();
+  
+  return;
+} 
+
+//-----------------------------------------------
+void TPManager::Next()
+{  
+  fCurrEvt++;
+  
+  if( !(fCurrEvt%fTotaEvtPrc) )
+    printf(" - analysed %i%% \n", int(fCurrEvt/fTotaEvtPrc) );
+  
+  DoEvent(fCurrEvt);
+  
+  return;
+} 
+
+//-----------------------------------------------
+void TPManager::DrawAll()
+{  
+  //
+  //
+  cMain->cd(1);
+  hProj[0]->Draw();
+  fSigExt_PMT->GetThresholdLine()->Draw();
+
+  for(int j=0; j<fSigExt_PMT->GetNumbOfHits(); j++)
+    fSigExt_PMT->GetStartLine(j)->Draw();
+
+  printf( " N bursts : %i \n", fSigExt_PMT->GetNumbOfHits());
+
+
+  
+  for(int i=1; i<fNChannel; i++)
+    {
+      cMain->cd(i+1);
+      //    fhSignal[i]->Draw();
+      hProj[i]->Draw();
+
+      for(int j=0; j<fSigExt_PMT->GetNumbOfHits(); j++)
+	fSigExt_PMT->GetStartLine(j)->Draw();
+    }
+  
+  cMain->Update();  
+  return;
+} 

@@ -1,0 +1,29 @@
+
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+//                                                                      //
+//                                                                      //
+//////////////////////////////////////////////////////////////////////////
+
+#ifndef TPMANAGER_HH
+#define TPMANAGER_HH
+
+#include <iostream>
+#include <fstream>
+
+#include <TObject.h>
+
+
+using namespace std;
+
+class TPManager: private TObject
+{
+public:
+  TPManager();
+  ~TPManager();
+
+  ClassDef( TPManager, 0 ) // A basic class 
+    };
+
+#endif
+

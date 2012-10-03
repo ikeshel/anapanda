@@ -1,0 +1,19 @@
+{
+  gSystem->Load("lib/libAnaPANDA.so");
+
+  TPManager mm;
+  
+  mm.ReadHistoFile("../12.09.05_FPGA_LED_PreAmp_Shaper/VPTT_x16_100ns_5kEv.root", 3);
+
+//
+//
+   TControlBar *bar = new TControlBar("vertical",  "AnaPANDA Control Bar", 1000, 1000);
+   bar->AddButton(" -- Event 100 -- ", "mm.DoEvent(100)",  "Click Here to draw event number 100");
+   bar->AddButton("Start",     "mm.DoStart(100)",  "Start 100ms");
+   bar->AddButton("Stop",      "mm.DoStop()",      "Stop");
+   bar->AddButton("Quit",      ".q",      "Quit .q");
+   bar->SetButtonWidth(300);
+   bar->Show();
+
+}
+

@@ -1,0 +1,76 @@
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+// author: i.keshelashvili@unibas.ch                                    //
+//                                                                      //
+//                                                                      //
+//                                                                      //
+//////////////////////////////////////////////////////////////////////////
+
+#include "TPSignalExtractor.hh"
+
+ClassImp( TPSignalExtractor )
+
+//-----------------------------------------------
+TPSignalExtractor::TPSignalExtractor()
+{
+  // init start and stop
+  //
+  for( Int_t i=0; i<MAX_CHANNEL; i++)
+    {
+      lStart[i] = new TLine(0,0,0,4100);
+      lStart[i]->SetLineColor(myColor[i]);
+
+      lStopp[i] = new TLine(0,0,0,4100);
+      lStopp[i]->SetLineColor(myColor[i]);
+    }
+
+  lThreshold = new TLine(0,0,7000,0);
+  lThreshold->SetLineColor(2);
+  lThreshold->SetLineStyle(3);
+}
+
+//-----------------------------------------------
+TPSignalExtractor::~TPSignalExtractor()
+{  
+  
+}
+
+//-----------------------------------------------
+void TPSignalExtractor::FindHits(TH1D* hHist, int threshold)
+{  
+  // hHist     : input histogram
+  // threshold : 
+  // edge      : 0 - falling edge; 1 - rising edge
+
+  if( !hHist->GetEntries() )
+    return;
+
+  int width   = 1; 
+  int average = threshold;
+
+  //
+  //
+  lThreshold->SetY1(threshold);
+  lThreshold->SetY2(threshold);
+   
+  fNHits=0;
+
+  // find start
+  //
+  for( int bin=width; bin<hHist->GetNbinsX(); bin++)
+    {
+      average=hHist->Integral(bin-width, bin+width)/(2*width+1);
+      
+      if( average < threshold )
+	{
+    	  lStart[fNHits]->SetX1( hHist->GetBinCenter( bin-width));
+    	  lStart[fNHits]->SetX2( hHist->GetBinCenter( bin-width));
+	  
+	  fNHits++;
+	  bin += 200;
+	}
+    }
+
+  return;
+}
+

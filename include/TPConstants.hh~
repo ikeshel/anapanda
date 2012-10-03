@@ -1,0 +1,7 @@
+
+#ifndef TPCONSTANTS_HH
+#define TPCONSTANTS_HH
+
+const Color_t myColor[] = {kRed, kGreen+1, kRed+2, kGreen+2, kRed+1, kGreen+1};
+
+#endif
