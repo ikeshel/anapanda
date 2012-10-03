@@ -11,7 +11,7 @@
 ClassImp( TPSignalExtractor )
 
 //-----------------------------------------------
-  TPSignalExtractor::TPSignalExtractor(char name[32], TH1D* hh)
+  TPSignalExtractor::TPSignalExtractor(const char* name, TH1D* hh)
 {
   fMaxHits = MAX_NHITS;
 

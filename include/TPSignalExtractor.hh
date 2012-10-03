@@ -48,7 +48,7 @@ protected:
 
 
 public:
-  TPSignalExtractor(char*, TH1D*);
+  TPSignalExtractor(const char*, TH1D*);
   ~TPSignalExtractor();
 
   //
