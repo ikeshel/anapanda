@@ -1,0 +1,8 @@
+
+ldd alternative for mac os x
+otool -L bin/anapanda
+
+
+
+
+
