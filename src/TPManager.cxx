@@ -1,10 +1,10 @@
 
-//////////////////////////////////////////////////////////////////////////
-//                                                                      //
-// author: i.keshelashvili@unibas.ch                                    //
-//                                                                      //
-//                                                                      //
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+//                                                                //
+// author: i.keshelashvili@unibas.ch                              //
+//                                                                //
+//                                                                //
+////////////////////////////////////////////////////////////////////
 
 #include "TPManager.hh"
 
@@ -31,6 +31,7 @@ TPManager::TPManager()
   //
   //
   fSigExt_PMT = new TPSignalExtractor("PMT", hProj[0]);
+  fSigExt_PMT->SetBaselineWidth(300);
   fSigExt_PMT->SetIntegrationWidth(30);
 
   //
@@ -40,7 +41,8 @@ TPManager::TPManager()
   //
   //
   fSigExt_SHP = new TPSignalExtractor("SHP", hProj[2]);
-  fSigExt_SHP->SetIntegrationWidth(100);
+  fSigExt_SHP->SetBaselineWidth(300);
+  fSigExt_SHP->SetIntegrationWidth(150);
 
 }
 
@@ -75,18 +77,34 @@ void TPManager::DoEvent(int ev)
     DoStop();
   
   for(int i=0; i<fNChannel; i++)
-    fhSignal[i] = GetProjection(i, fCurrEvt);
+    GetProjection(i, fCurrEvt);
 
-  //
+  if( ! hProj[0]->GetEntries() ) return;
+
+  // set the start lines
   //
   fSigExt_PMT->FindHits(3000, hProj[0]);
 
-  fSigExt_PMT->GetIntegral(0, hProj[0]);
-  fSigExt_PMT->GetIntegral(1, hProj[0]);
+  for(int i=0; i<fSigExt_PMT->GetNumbOfHits(); i++)
+    {
+      fSigExt_AMP->SetStartLine( i, 
+				 fSigExt_PMT->GetStartLine(i)->GetX1());
+      fSigExt_SHP->SetStartLine( i, 
+				 fSigExt_PMT->GetStartLine(i)->GetX1());
+    }
+
+  //
+  //
+  for(int i=0; i<fSigExt_PMT->GetNumbOfHits(); i++)
+    {
+      fSigExt_PMT->GetIntegral(i, hProj[0], 10); // pmt
+      
+      fSigExt_SHP->GetIntegral(i, hProj[2], 30); // shp
+    }
 
   DrawAll();
   
-  return;
+  return; 
 } 
 
 //-----------------------------------------------
@@ -122,15 +140,17 @@ void TPManager::DrawAll()
 
   cMain->cd(4);
   fSigExt_PMT->GetSignalDist(0)->Draw();
+  for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
+    fSigExt_PMT->GetSignalDist(i)->Draw("same");
 
   // Amp
   //
   cMain->cd(2);
   hProj[1]->Draw();
   
-  for(int j=0; j<fSigExt_PMT->GetNumbOfHits(); j++)
+  for(int i=0; i<fSigExt_PMT->GetNumbOfHits(); i++)
     {
-      fSigExt_PMT->GetStartLine(j)->Draw();
+      fSigExt_AMP->GetStartLine(i)->Draw();
     }
   
   cMain->cd(5);
@@ -141,15 +161,18 @@ void TPManager::DrawAll()
   cMain->cd(3);
   hProj[2]->Draw();
   
-  for(int j=0; j<fSigExt_PMT->GetNumbOfHits(); j++)
+  for(int i=0; i<fSigExt_PMT->GetNumbOfHits(); i++)
     {
-      fSigExt_PMT->GetStartLine(j)->Draw();
-      fSigExt_PMT->GetStoppLine(j)->Draw();
-      fSigExt_SHP->GetOffset(j)->Draw("same");
+      fSigExt_SHP->GetStartLine(i)->Draw();
+      fSigExt_SHP->GetStoppLine(i)->Draw();
+      fSigExt_SHP->GetOffset(i)->Draw("same");
     }
   
   cMain->cd(6);
   fSigExt_SHP->GetSignalDist(0)->Draw();
+
+  for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
+    fSigExt_SHP->GetSignalDist(i)->Draw("same");
   
   cMain->Update();  
   return;

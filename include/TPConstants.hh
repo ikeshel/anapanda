@@ -15,6 +15,6 @@
 
 enum { PMT, PREAMP, SHAPER };
 
-const Color_t myColor[] = {kRed, kGreen+1, kRed+2, kGreen+2, kRed+1, kGreen+1};
+const Color_t myColor[] = {kRed, kGreen+2, kRed+2, kGreen+3, kRed+1, kGreen+4};
 
 #endif

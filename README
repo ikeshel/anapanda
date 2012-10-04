@@ -1,4 +1,23 @@
+<<<<<<< HEAD
 ldd alternative for mac os x
 otool -L bin/anapanda
 
 git clone git://github.com/ikeshel/anapanda.git
+=======
+
+<<<<<<< HEAD
+
+ldd alternative for mac os x
+otool -L bin/anapanda
+
+git clone git://github.com/ikeshel/anapanda.git
+=======
+ldd alternative for mac os x
+otool -L bin/anapanda
+
+
+
+
+
+>>>>>>> origin/HEAD
+>>>>>>> SetTimeLine, fBaselineWidth and some more options added

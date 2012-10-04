@@ -13,6 +13,7 @@
 #include <fstream>
 
 #include <TH1D.h>
+#include <TF1.h>
 #include <TLine.h>
 
 #include <TPConstants.hh>
@@ -21,33 +22,57 @@ using namespace std;
 
 class TPSignalExtractor
 {
+private:
+  int fMaxHits; // maximum number of hits
+  int fNHits;   // store number of hits
+
+  int fIntegrationWidth;
+
 protected:
 
-  //
-  //
-  TLine *lStart[MAX_NHITS];
-  TLine *lStopp[MAX_NHITS];
+  TH1D* hHist;
 
-  TLine *lThreshold;
+  //
+  //
+  TH1D * hSignalDist[MAX_NHITS];
+
+  //
+  //
+  TF1  * fOffset[MAX_NHITS];
+
+  // threshold, start and stop lines
+  //
+  TLine * lThreshold;
+  TLine * lStart[MAX_NHITS];
+  TLine * lStopp[MAX_NHITS];
+
 
 public:
-  TPSignalExtractor();
+  TPSignalExtractor(const char*, TH1D*);
   ~TPSignalExtractor();
 
-  int fNHits; // store number of hits
+  //
+  //
+  void FindHits(int, TH1D*);
 
+  // Set's
   //
-  //
-  void FindHits(TH1D*, int);
+  void SetMaxHits(int);
+  void SetIntegrationWidth(int);
 
   // Get's
   //
-  int GetNumbOfHits() { return fNHits; };
+  int    GetNumbOfHits()      { return fNHits; };
 
-  TLine* GetThresholdLine() { return lThreshold; };
-  TLine* GetStartLine(int i) { return lStart[i]; };
-  TLine* GetStoppLine(int i) { return lStopp[i]; };
+  TF1*   GetOffset(int i)     { return fOffset[i]; };
+
+  TH1D*  GetSignalDist(int i) { return hSignalDist[i]; };
+
+  TLine* GetThresholdLine()   { return lThreshold; };
+  TLine* GetStartLine(int i)  { return lStart[i]; };
+  TLine* GetStoppLine(int i)  { return lStopp[i]; };
   
+  double GetIntegral(int, TH1D*);
 
   ClassDef( TPSignalExtractor, 0 ) // A basic class 
     };

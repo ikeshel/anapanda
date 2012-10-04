@@ -1,10 +1,10 @@
-//////////////////////////////////////////////////////////////////////////
-//                                                                      //
-// author: i.keshelashvili@unibas.ch                                    //
-//                                                                      //
-//                                                                      //
-//                                                                      //
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+//                                                               //
+// author: i.keshelashvili@unibas.ch                             //
+//                                                               //
+//                                                               //
+//                                                               //
+///////////////////////////////////////////////////////////////////
 
 #include "TPSignalExtractor.hh"
 
@@ -24,6 +24,8 @@ ClassImp( TPSignalExtractor )
     {
       sprintf(szName, "%s_%i", name, i);
       hSignalDist[i] = new TH1D(szName, "", 4100, 0, 4100);
+      hSignalDist[i]->SetLineColor(myColor[i]+3);
+      hSignalDist[i]->SetFillColor(myColor[i]);
 
       sprintf(szName, "fOffset_%i", i);
       fOffset[i] = new TF1(szName, "pol0");
@@ -63,11 +65,36 @@ void TPSignalExtractor::SetIntegrationWidth(int w)
 }
 
 //-----------------------------------------------
+void TPSignalExtractor::SetBaselineWidth(int w)
+{
+  fBaselineWidth = w;
+  return;
+}
+
+//-----------------------------------------------
+void TPSignalExtractor::SetStartLine(int n, double t)
+{
+  lStart[n]->SetX1( t ); 
+  lStart[n]->SetX2( t ); 
+
+  lStopp[n]->SetX1( t +fIntegrationWidth ); 
+  lStopp[n]->SetX2( t +fIntegrationWidth ); 
+
+  return;
+}
+
+//-----------------------------------------------
 void TPSignalExtractor::FindHits(int threshold, TH1D* hHist)
 {  
-  // hHist     : input histogram
   // threshold : 
-  // edge      : 0 - falling edge; 1 - rising edge
+  // hHist     : input histogram
+
+  // |___________________________________________>
+  // | ___    ____________    _____________
+  // |    \  /            \  /
+  // | ----\/--------------\/------ threshold
+  // |     1               2   
+  //  
 
   if( !hHist->GetEntries() ) return;
 
@@ -95,7 +122,7 @@ void TPSignalExtractor::FindHits(int threshold, TH1D* hHist)
 	  fNHits++;
 	  //	  if( fNHits > fMaxHits ) return;
 
-	  bin += 200;
+	  bin += (fBaselineWidth+fIntegrationWidth);
 	}
     }
 
@@ -103,22 +130,21 @@ void TPSignalExtractor::FindHits(int threshold, TH1D* hHist)
 }
 
 //-----------------------------------------------
-double TPSignalExtractor::GetIntegral(int n, TH1D* hHist)
+double TPSignalExtractor::GetIntegral(int n, TH1D* hHist, double scale)
 {
   // ______________________________________________>
   // |          |             |    | signal
-  // |           <--       --> <-->
+  // |          |<--       -->|<-->|
   // |          |    width    |   offse
   // |        start          stop
 
-  if( !hHist->GetEntries() )
-    return 0;
+  if( !hHist->GetEntries() ) return 0;
 
   static int start;
   static int stopp;
   static int offse = 5;
   
-  start = lStart[n]->GetX1() -offse -fIntegrationWidth;
+  start = lStart[n]->GetX1() -offse -fBaselineWidth;
   stopp = lStart[n]->GetX1() -offse;
   
   fOffset[n]->SetRange( start, stopp );
@@ -136,7 +162,7 @@ double TPSignalExtractor::GetIntegral(int n, TH1D* hHist)
   double amp = ( fOffset[n]->Eval(0)*fIntegrationWidth - 
 		 hHist->Integral(start, stopp) );
 
-  hSignalDist[n]->Fill(amp/10);
+  hSignalDist[n]->Fill(amp/scale);
     
   return amp;
 }

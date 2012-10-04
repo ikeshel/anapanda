@@ -1,10 +1,10 @@
 
-//////////////////////////////////////////////////////////////////////////
-//                                                                      //
-// author: i.keshelashvili@unibas.ch                                    //
-//                                                                      //
-//                                                                      //
-//////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//                                                             //
+// author: i.keshelashvili@unibas.ch                           //
+//                                                             //
+//                                                             //
+/////////////////////////////////////////////////////////////////
 
 #ifndef TPSIGNALEXTRACTOR_HH
 #define TPSIGNALEXTRACTOR_HH
@@ -27,6 +27,7 @@ private:
   int fNHits;   // store number of hits
 
   int fIntegrationWidth;
+  int fBaselineWidth;
 
 protected:
 
@@ -51,7 +52,7 @@ public:
   TPSignalExtractor(const char*, TH1D*);
   ~TPSignalExtractor();
 
-  //
+  // 
   //
   void FindHits(int, TH1D*);
 
@@ -59,6 +60,9 @@ public:
   //
   void SetMaxHits(int);
   void SetIntegrationWidth(int);
+  void SetBaselineWidth(int);
+
+  void SetStartLine(int, double);
 
   // Get's
   //
@@ -72,7 +76,7 @@ public:
   TLine* GetStartLine(int i)  { return lStart[i]; };
   TLine* GetStoppLine(int i)  { return lStopp[i]; };
   
-  double GetIntegral(int, TH1D*);
+  double GetIntegral(int, TH1D*, double);
 
   ClassDef( TPSignalExtractor, 0 ) // A basic class 
     };
