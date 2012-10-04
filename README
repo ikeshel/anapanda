@@ -1,8 +1,4 @@
-
 ldd alternative for mac os x
 otool -L bin/anapanda
 
-
-
-
-
+git clone git://github.com/ikeshel/anapanda.git
