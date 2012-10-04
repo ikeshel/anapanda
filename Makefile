@@ -21,10 +21,6 @@ OBJ           = $(notdir $(OBJD))
 
 OSTYPE       := $(subst -,,$(shell uname))
 
-#ROOTGLIBS    := $(shell root-config --glibs)
-#ROOTCFLAGS   := $(shell root-config --cflags)
-#ROOTLDFLAGS  := $(shell root-config --ldflags)
-
 ROOTGLIBS    := $(shell root-config --libs --glibs) -lEG -lFoam
 ROOTCFLAGS   := $(shell root-config --cflags)
 ROOTLDFLAGS  := $(shell root-config --ldflags)
@@ -77,7 +73,7 @@ $(LIB_AnaPANDA): $(OBJ)
 
 $(S)/Dict.cxx: $(INC) $(I)/LinkDef.hh 
 	@echo
-	@echo "Creating CaLIB dictionary ..."
+	@echo "Creating AnaPANDA dictionary ..."
 	@rootcint -v -f $@ -c -I./$(I) -p $(INC) $(I)/LinkDef.hh
 
 %.o: %.cxx
