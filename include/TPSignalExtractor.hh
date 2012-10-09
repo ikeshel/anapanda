@@ -28,6 +28,7 @@ private:
 
   int fIntegrationWidth;
   int fBaselineWidth;
+  int fRiseTime;
 
 protected:
 
@@ -39,7 +40,9 @@ protected:
 
   //
   //
-  TF1  * fOffset[MAX_NHITS];
+  TF1  * fOffset[    MAX_NHITS];
+  TF1  * fAmplitude[ MAX_NHITS];
+  TF1  * fExpo[      MAX_NHITS];
 
   // threshold, start and stop lines
   //
@@ -61,6 +64,7 @@ public:
   void SetMaxHits(int);
   void SetIntegrationWidth(int);
   void SetBaselineWidth(int);
+  void SetRiseTime(int);
 
   void SetStartLine(int, double);
 
@@ -68,7 +72,8 @@ public:
   //
   int    GetNumbOfHits()      { return fNHits; };
 
-  TF1*   GetOffset(int i)     { return fOffset[i]; };
+  TF1*   GetOffsetFunction(int i) { return fOffset[i];    };
+  TF1*   GetAmplitudeFunct(int i) { return fAmplitude[i]; };
 
   TH1D*  GetSignalDist(int i) { return hSignalDist[i]; };
 
@@ -76,7 +81,8 @@ public:
   TLine* GetStartLine(int i)  { return lStart[i]; };
   TLine* GetStoppLine(int i)  { return lStopp[i]; };
   
-  double GetIntegral(int, TH1D*, double);
+  double GetIntegral(int, TH1D*, double); // 
+  double GetAmplitude(int, TH1D*, double); // 
 
   ClassDef( TPSignalExtractor, 0 ) // A basic class 
     };

@@ -81,6 +81,7 @@ TH1D* TPFileReader::GetProjection(int ch, int event)
   hProj[ch] = (TH1D*) h2D[ch]->ProjectionX(projname, event, event);
   //  hProj[ch] = (TH1D*) h2D[ch]->ProjectionX(projname, event, event)->Clone();
   hProj[ch]->GetYaxis()->SetRangeUser(0, 4100);
-  
+  hProj[ch]->SetStats(0);
+
   return hProj[ch];
 }

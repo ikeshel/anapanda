@@ -31,6 +31,8 @@ private:
   TTimer*  fTimer;
 
   TH1D* fhSignal[MAX_CHANNEL];
+
+  bool  fbDrawOnOff;
   
 protected:
   int fNBurst;
@@ -50,6 +52,7 @@ public:
   void DoStart(int);
   void DoStop();
   void DoEvent(int);
+  void DoDrawOnOff();
   
   // 
   //

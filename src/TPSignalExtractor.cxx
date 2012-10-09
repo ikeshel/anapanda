@@ -24,13 +24,21 @@ ClassImp( TPSignalExtractor )
     {
       sprintf(szName, "%s_%i", name, i);
       hSignalDist[i] = new TH1D(szName, "", 4100, 0, 4100);
-      hSignalDist[i]->SetLineColor(myColor[i]+3);
+      hSignalDist[i]->SetStats(0);
+      hSignalDist[i]->SetLineColor(myColor[i]+2);
       hSignalDist[i]->SetFillColor(myColor[i]);
 
       sprintf(szName, "fOffset_%i", i);
       fOffset[i] = new TF1(szName, "pol0");
       fOffset[i]->SetLineColor(myColor[i]);
 
+      sprintf(szName, "fAmp_%i", i);
+      fAmplitude[i] = new TF1(szName, "pol0");
+      fAmplitude[i]->SetLineColor(myColor[i]);
+
+      sprintf(szName, "fExpo_%i", i);
+      fExpo[i] = new TF1(szName, "pol0");
+      fExpo[i]->SetLineColor(myColor[i]);
 
       lStart[i] = new TLine(0,0,0,4100);
       lStart[i]->SetLineColor(myColor[i]);
@@ -68,6 +76,13 @@ void TPSignalExtractor::SetIntegrationWidth(int w)
 void TPSignalExtractor::SetBaselineWidth(int w)
 {
   fBaselineWidth = w;
+  return;
+}
+
+//-----------------------------------------------
+void TPSignalExtractor::SetRiseTime(int rt)
+{
+  fRiseTime = rt;
   return;
 }
 
@@ -162,6 +177,69 @@ double TPSignalExtractor::GetIntegral(int n, TH1D* hHist, double scale)
   double amp = ( fOffset[n]->Eval(0)*fIntegrationWidth - 
 		 hHist->Integral(start, stopp) );
 
+  hSignalDist[n]->Fill(amp/scale);
+    
+  return amp;
+}
+
+//-----------------------------------------------
+double TPSignalExtractor::GetAmplitude(int n, TH1D* hHist, double scale)
+{
+  /*
+  // ^
+  // |         |\
+  // |     |\  |  \
+  // |     |  \|   \
+  // |_____|         \________
+  // ___________________________________>
+  */
+
+  if( !hHist->GetEntries() ) return 0;
+
+  static int start;
+  static int stopp;
+  static int offse = 5;
+  
+  // extract offset
+  // 
+  start = lStart[n]->GetX1() -offse -fBaselineWidth;
+  stopp = lStart[n]->GetX1() -offse;
+  
+  fOffset[n]->SetRange( start, stopp );
+  hHist->Fit( fOffset[n], "+RQ0");
+  
+  // redefine start stop
+  //
+  start = lStart[n]->GetX1() -offse ;
+  stopp = lStart[n]->GetX1() -offse +fRiseTime;
+
+  lStart[n]->SetX1(start); // redefinition of start line
+  lStart[n]->SetX2(start);
+  
+  lStopp[n]->SetX1(stopp); // stop line
+  lStopp[n]->SetX2(stopp);
+  
+  // finding the maximum
+  //
+  int    maxbin = 0;
+  double amp    = 0;
+  
+  for(int bin=start; bin<(start+fRiseTime); bin++)
+    if( amp < hHist->Integral(bin, bin+fIntegrationWidth) )
+      {
+	amp = hHist->Integral(bin, bin+fIntegrationWidth);
+	maxbin = bin;
+      }
+
+  start = maxbin -fIntegrationWidth/2;
+  stopp = maxbin +fIntegrationWidth/2;
+
+  fAmplitude[n]->SetRange( start, stopp );
+  hHist->Fit( fAmplitude[n], "+RQ0");
+
+  amp  = fAmplitude[n]->Eval(0);
+  amp -= fOffset[n]->Eval(0);
+  
   hSignalDist[n]->Fill(amp/scale);
     
   return amp;

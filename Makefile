@@ -53,8 +53,7 @@ LDFLAGS     = -g -O3 $(ROOTLDFLAGS)
 
 # ------------------------------------ targets ------------------------------------
 
-all:	$(LIB_AnaPANDA) \
-	$(B)/anapanda
+all:	$(LIB_AnaPANDA) $(B)/anapanda
 
 $(B)/anapanda: $(LIB_AnaPANDA) $(S)/anapanda.cxx
 	@echo
