@@ -33,21 +33,21 @@ TPManager::TPManager()
   //
   //
   fSigExt_PMT = new TPSignalExtractor("PMT", hProj[0]);
-  fSigExt_PMT->SetBaselineWidth(300);
-  fSigExt_PMT->SetIntegrationWidth(30);
+  fSigExt_PMT->SetBaselineWidth(    GetConfigInt("PMT.BaselineWidth")    );
+  fSigExt_PMT->SetIntegrationWidth( GetConfigInt("PMT.IntegrationWidth") );
 
   //
   //
   fSigExt_AMP = new TPSignalExtractor("AMP", hProj[1]);
-  fSigExt_AMP->SetBaselineWidth(300);
-  fSigExt_AMP->SetIntegrationWidth(100);
-  fSigExt_AMP->SetRiseTime(600);
+  fSigExt_AMP->SetBaselineWidth(    GetConfigInt("AMP.BaselineWidth")    );
+  fSigExt_AMP->SetIntegrationWidth( GetConfigInt("AMP.IntegrationWidth") );
+  fSigExt_AMP->SetRiseTime(         GetConfigInt("AMP.RiseTime") );
 
   //
   //
   fSigExt_SHP = new TPSignalExtractor("SHP", hProj[2]);
-  fSigExt_SHP->SetBaselineWidth(300);
-  fSigExt_SHP->SetIntegrationWidth(150);
+  fSigExt_SHP->SetBaselineWidth(    GetConfigInt("SHP.BaselineWidth")    );
+  fSigExt_SHP->SetIntegrationWidth( GetConfigInt("SHP.IntegrationWidth") );
 }
 
 //-----------------------------------------------
@@ -85,7 +85,7 @@ void TPManager::DoEvent(int ev)
 
   // set the start lines
   //
-  fSigExt_PMT->FindHits(3000, hProj[0]);
+  fSigExt_PMT->FindHits( GetConfigInt("PMT.Threshold"), hProj[0]);
 
   for(int i=0; i<fSigExt_PMT->GetNumbOfHits(); i++)
     {

@@ -18,13 +18,14 @@
 #include <TH1D.h>
 
 #include <TPConstants.hh>
+#include <TPConfig.hh>
 #include <TPFileReader.hh>
 #include <TPSignalExtractor.hh>
 
 using namespace std;
 
 class TPManager: 
-  private TObject, public TPFileReader//, public TPSignalExtractor
+  private TObject, public TPConfig, public TPFileReader
 {
 private:
   TCanvas* cMain;

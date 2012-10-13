@@ -21,6 +21,7 @@
 
 // 
 #pragma link C++ class TPManager+;
+#pragma link C++ class TPConfig+;
 #pragma link C++ class TPFileReader+;
 #pragma link C++ class TPSignalExtractor+;
 

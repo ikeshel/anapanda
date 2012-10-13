@@ -13,6 +13,7 @@
 #include <fstream>
 
 #include <TH1D.h>
+#include <TH2D.h>
 #include <TF1.h>
 #include <TLine.h>
 
@@ -31,13 +32,20 @@ private:
   int fRiseTime;
 
 protected:
-
+  //
+  //
   TH1D* hHist;
 
   //
   //
   TH1D * hSignalDist[MAX_NHITS];
 
+  // sweep
+  //
+  TH2D     *hAmpVsDel[MAX_NHITS];
+  TProfile *hAmpVsDel_px[MAX_NHITS];
+  //  TF1      *fAmpVsDel_px[MAX_NHITS];
+  
   //
   //
   TF1  * fOffset[    MAX_NHITS];
@@ -72,16 +80,17 @@ public:
   //
   int    GetNumbOfHits()      { return fNHits; };
 
-  TF1*   GetOffsetFunction(int i) { return fOffset[i];    };
-  TF1*   GetAmplitudeFunct(int i) { return fAmplitude[i]; };
+  TF1 *   GetOffsetFunction(int i) { return fOffset[i];    };
+  TF1 *   GetAmplitudeFunct(int i) { return fAmplitude[i]; };
 
-  TH1D*  GetSignalDist(int i) { return hSignalDist[i]; };
+  TH1D * GetSignalDist(int i) { return hSignalDist[i]; };
+  TH2D * GetAmpVsDel(int i)   { return hAmpVsDel[i];   };
 
-  TLine* GetThresholdLine()   { return lThreshold; };
-  TLine* GetStartLine(int i)  { return lStart[i]; };
-  TLine* GetStoppLine(int i)  { return lStopp[i]; };
+  TLine * GetThresholdLine()   { return lThreshold; };
+  TLine * GetStartLine(int i)  { return lStart[i];  };
+  TLine * GetStoppLine(int i)  { return lStopp[i];  };
   
-  double GetIntegral(int, TH1D*, double); // 
+  double GetIntegral( int, TH1D*, double); // 
   double GetAmplitude(int, TH1D*, double); // 
 
   ClassDef( TPSignalExtractor, 0 ) // A basic class 
