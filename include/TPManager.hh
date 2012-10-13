@@ -37,6 +37,7 @@ private:
   
 protected:
   int fNBurst;
+  int fDrawScale;
   
   TPSignalExtractor *fSigExt_PMT;
   TPSignalExtractor *fSigExt_AMP;
@@ -59,6 +60,10 @@ public:
   //
   void Next();
   void DrawAll();
+
+  // set
+  //
+  void SetDrawScale(unsigned int);
 
   ClassDef( TPManager, 0 ) // A basic class 
     };

@@ -10,7 +10,7 @@
 
 ClassImp( TPSignalExtractor )
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
   TPSignalExtractor::TPSignalExtractor(const char* name, TH1D* hh)
 {
   fMaxHits = MAX_NHITS;
@@ -33,7 +33,8 @@ ClassImp( TPSignalExtractor )
       // amplitude vs delay 2D histos
       //
       sprintf(szName, "%s_AmVsDt_%i", name, i);
-      hAmpVsDel[i] = new TH2D(szName, ";Delay [#mus];Norm. Amp. [%]", 105, 0., 10.5,   100, 90, 110);
+      hAmpVsDel[i] = new TH2D( szName, ";Delay [#mus];Norm. Amp. [%]", 
+			       105, 0., 10.5,   100, 90, 110);
       hAmpVsDel[i]->SetMarkerColor(myColor[i]);
 
 
@@ -61,41 +62,40 @@ ClassImp( TPSignalExtractor )
   lThreshold->SetLineStyle(3);
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 TPSignalExtractor::~TPSignalExtractor()
 {  
-  
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPSignalExtractor::SetMaxHits(int n)
 {
   fMaxHits = n;
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPSignalExtractor::SetIntegrationWidth(int w)
 {
   fIntegrationWidth = w;
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPSignalExtractor::SetBaselineWidth(int w)
 {
   fBaselineWidth = w;
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPSignalExtractor::SetRiseTime(int rt)
 {
   fRiseTime = rt;
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPSignalExtractor::SetStartLine(int n, double t)
 {
   lStart[n]->SetX1( t ); 
@@ -107,7 +107,7 @@ void TPSignalExtractor::SetStartLine(int n, double t)
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPSignalExtractor::FindHits(int threshold, TH1D* hHist)
 {  
   // threshold : 
@@ -153,7 +153,7 @@ void TPSignalExtractor::FindHits(int threshold, TH1D* hHist)
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 double TPSignalExtractor::GetIntegral(int n, TH1D* hHist, double scale)
 {
   // ______________________________________________>
@@ -174,7 +174,7 @@ double TPSignalExtractor::GetIntegral(int n, TH1D* hHist, double scale)
   fOffset[n]->SetRange( start, stopp );
   hHist->Fit( fOffset[n], "+RQ0");
   
-  start = lStart[n]->GetX1() -offse ;
+  start = lStart[n]->GetX1() -offse;
   stopp = lStart[n]->GetX1() -offse +fIntegrationWidth;
 
   lStart[n]->SetX1(start); // redefinition of start line
@@ -191,7 +191,7 @@ double TPSignalExtractor::GetIntegral(int n, TH1D* hHist, double scale)
   return amp;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 double TPSignalExtractor::GetAmplitude(int n, TH1D* hHist, double scale)
 {
   /*

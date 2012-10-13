@@ -138,6 +138,22 @@ int TPConfig::GetConfigInt( TString name )
 }
 
 //------------------------------------------------------------------------------
+float TPConfig::GetConfigFloat( TString name )
+{
+  float out = 0;
+  
+  for( int i=0; i<nLine; i++)
+    {
+      if( !( strLine[i].BeginsWith("#") ) && 
+	  strLine[i].Contains( name )    )
+	{
+	  sscanf(this->ExtractName( strLine[i] ).Data(), "%f", &out);
+	}      
+    }
+  return out; 
+}
+
+//------------------------------------------------------------------------------
 void TPConfig::WriteConfigFile()
 {
   //

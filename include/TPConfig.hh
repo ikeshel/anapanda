@@ -45,6 +45,8 @@ public:
 
   int          GetConfigInt( TString );
 
+  float        GetConfigFloat( TString );
+
   //
   //
   void WriteConfigFile();

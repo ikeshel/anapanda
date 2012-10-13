@@ -10,17 +10,18 @@
 
 ClassImp( TPManager )
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 TPManager::TPManager()
 {
-  printf("  ****************************************************\n"
-	 "  *                                                  *\n"
-	 "  *        W E L C O M E  to  A N A P A N D A        *\n"
-	 "  *                                                  *\n"
-	 "  *                                                  *\n"
-	 "  ****************************************************\n");
+  printf("  **************************************************** \n"
+	 "  *                                                  * \n"
+	 "  *        W E L C O M E  to  A N A P A N D A        * \n"
+	 "  *                                                  * \n"
+	 "  *                                                  * \n"
+	 "  **************************************************** \n");
 
   fNBurst = 2;
+  fDrawScale = 1;
 
   fbDrawOnOff = kTRUE;
 
@@ -50,12 +51,19 @@ TPManager::TPManager()
   fSigExt_SHP->SetIntegrationWidth( GetConfigInt("SHP.IntegrationWidth") );
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 TPManager::~TPManager()
 {  
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
+void TPManager::SetDrawScale(unsigned int sc=1)
+{
+  fDrawScale = sc;
+  return;
+}
+
+//------------------------------------------------------------------------------
 void TPManager::DoStart(int interval=1)
 {  
   fTimer->Start(interval);
@@ -63,7 +71,7 @@ void TPManager::DoStart(int interval=1)
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPManager::DoStop()
 {  
   fTimer->Stop();
@@ -71,12 +79,10 @@ void TPManager::DoStop()
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPManager::DoEvent(int ev)
 {  
   fCurrEvt = ev;
-
-  if( fCurrEvt > fTotaEvt ) DoStop();
   
   for(int i=0; i<fNChannel; i++)
     GetProjection(i, fCurrEvt);
@@ -89,30 +95,27 @@ void TPManager::DoEvent(int ev)
 
   for(int i=0; i<fSigExt_PMT->GetNumbOfHits(); i++)
     {
-      fSigExt_AMP->SetStartLine( i, 
-				 fSigExt_PMT->GetStartLine(i)->GetX1());
-      fSigExt_SHP->SetStartLine( i, 
-				 fSigExt_PMT->GetStartLine(i)->GetX1());
+      fSigExt_AMP->SetStartLine( i, fSigExt_PMT->GetStartLine(i)->GetX1());
+      fSigExt_SHP->SetStartLine( i, fSigExt_PMT->GetStartLine(i)->GetX1());
     }
 
   // Estract amplitudes
   //
   for(int i=0; i<fSigExt_PMT->GetNumbOfHits(); i++)
     {
-      fSigExt_PMT->GetIntegral(i, hProj[0], 7.7); // pmt
-      
-      fSigExt_AMP->GetAmplitude(i, hProj[1], 1); // PreAmp
-      
-      fSigExt_SHP->GetIntegral(i, hProj[2], 40); // shp
+      fSigExt_PMT->GetIntegral(  i, hProj[0], GetConfigFloat("PMT.Scale") );      
+      fSigExt_AMP->GetAmplitude( i, hProj[1], GetConfigFloat("AMP.Scale") ); 
+      fSigExt_SHP->GetIntegral(  i, hProj[2], GetConfigFloat("SHP.Scale") ); 
     }
 
   if( fbDrawOnOff )
-    DrawAll();
+    if( !(fCurrEvt%fDrawScale) || fCurrEvt==0 )
+      DrawAll();
   
   return; 
 } 
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPManager::DoDrawOnOff()
 {  
   if( fbDrawOnOff )
@@ -123,7 +126,7 @@ void TPManager::DoDrawOnOff()
   return;
 }
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPManager::Next()
 {  
   fCurrEvt++;
@@ -133,10 +136,12 @@ void TPManager::Next()
   
   DoEvent(fCurrEvt);
   
+  if( fCurrEvt > fTotaEvt ) DoStop();
+
   return;
 } 
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 void TPManager::DrawAll()
 {  
   // PMT

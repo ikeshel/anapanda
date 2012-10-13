@@ -78,13 +78,13 @@ public:
 
   // Get's
   //
-  int    GetNumbOfHits()      { return fNHits; };
+  int     GetNumbOfHits()      { return fNHits; };
 
   TF1 *   GetOffsetFunction(int i) { return fOffset[i];    };
   TF1 *   GetAmplitudeFunct(int i) { return fAmplitude[i]; };
-
-  TH1D * GetSignalDist(int i) { return hSignalDist[i]; };
-  TH2D * GetAmpVsDel(int i)   { return hAmpVsDel[i];   };
+	  
+  TH1D *  GetSignalDist(int i) { return hSignalDist[i]; };
+  TH2D *  GetAmpVsDel(int i)   { return hAmpVsDel[i];   };
 
   TLine * GetThresholdLine()   { return lThreshold; };
   TLine * GetStartLine(int i)  { return lStart[i];  };
