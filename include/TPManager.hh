@@ -31,8 +31,6 @@ private:
   TCanvas* cMain;
   TTimer*  fTimer;
 
-  TH1D* fhSignal[MAX_CHANNEL];
-
   bool  fbDrawOnOff;
   
 protected:

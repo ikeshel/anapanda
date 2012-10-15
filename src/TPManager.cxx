@@ -75,6 +75,7 @@ void TPManager::DoStart(int interval=1)
 void TPManager::DoStop()
 {  
   fTimer->Stop();
+  DrawAll();
   Info("DoStop()", "-done");
   return;
 }
@@ -82,12 +83,12 @@ void TPManager::DoStop()
 //------------------------------------------------------------------------------
 void TPManager::DoEvent(int ev)
 {  
-  fCurrEvt = ev;
+  fCurrEvt = ev; // set the current event
   
-  for(int i=0; i<fNChannel; i++)
+  for(int i=0; i<fNChannel; i++) // extract current event from 2D histo
     GetProjection(i, fCurrEvt);
-
-  if( ! hProj[0]->GetEntries() ) return;
+  
+  if( ! hProj[0]->GetEntries() ) return; // 
 
   // set the start lines
   //
@@ -108,6 +109,12 @@ void TPManager::DoEvent(int ev)
       fSigExt_SHP->GetIntegral(  i, hProj[2], GetConfigFloat("SHP.Scale") ); 
     }
 
+  // fill time distributions
+  //
+  fSigExt_PMT->FillAmpVsDel();
+  fSigExt_AMP->FillAmpVsDel();
+  fSigExt_SHP->FillAmpVsDel();
+  
   if( fbDrawOnOff )
     if( !(fCurrEvt%fDrawScale) || fCurrEvt==0 )
       DrawAll();
@@ -122,7 +129,7 @@ void TPManager::DoDrawOnOff()
     fbDrawOnOff = kFALSE;
   else
     fbDrawOnOff = kTRUE;
-
+  DrawAll();
   return;
 }
 
@@ -162,6 +169,11 @@ void TPManager::DrawAll()
   for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
     fSigExt_PMT->GetSignalDist(i)->Draw("same");
 
+  cMain->cd(7);
+  fSigExt_PMT->GetAmpVsDel(0)->Draw();
+  for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
+    fSigExt_PMT->GetAmpVsDel(i)->Draw("same");
+
   // Amp
   //
   cMain->cd(2);
@@ -180,6 +192,11 @@ void TPManager::DrawAll()
   for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
     fSigExt_AMP->GetSignalDist(i)->Draw("same");
   
+  cMain->cd(8);
+  fSigExt_AMP->GetAmpVsDel(0)->Draw();
+  // for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
+  //   fSigExt_AMP->GetAmpVsDel(i)->Draw("same");
+
   // Shp
   //
   cMain->cd(3);
@@ -194,10 +211,14 @@ void TPManager::DrawAll()
   
   cMain->cd(6);
   fSigExt_SHP->GetSignalDist(0)->Draw();
-
   for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
     fSigExt_SHP->GetSignalDist(i)->Draw("same");
   
+  cMain->cd(9);
+  fSigExt_SHP->GetAmpVsDel(0)->Draw();
+  // for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
+  //   fSigExt_SHP->GetAmpVsDel(i)->Draw("same");
+
   cMain->Update();  
   return;
 } 

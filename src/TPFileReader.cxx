@@ -69,11 +69,11 @@ TH1D* TPFileReader::GetProjection(int ch, int event)
 {
   if( !h2D[ch] ) return 0;
   
-//   if( hProj[ch] )
-//     {
-//       delete hProj[ch];
-//       hProj[ch]=0;
-//     }
+  if( hProj[ch] )
+    {
+      hProj[ch]->Delete();
+      hProj[ch]=0;
+    }
 
   char projname[32];
   sprintf(projname, "hSADC_%i", ch);

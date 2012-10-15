@@ -183,7 +183,7 @@ double TPSignalExtractor::GetIntegral(int n, TH1D* hHist, double scale)
   lStopp[n]->SetX1(stopp); // stop line
   lStopp[n]->SetX2(stopp);
   
-  double amp = ( fOffset[n]->Eval(0)*fIntegrationWidth - 
+  double amp = ( fOffset[n]->Integral(start, stopp) - 
 		 hHist->Integral(start, stopp) );
 
   hSignalDist[n]->Fill(amp/scale);
@@ -230,26 +230,32 @@ double TPSignalExtractor::GetAmplitude(int n, TH1D* hHist, double scale)
   
   // finding the maximum
   //
-  int    maxbin = 0;
-  double amp    = 0;
-  
+  start += fIntegrationWidth;   
+  fAmpl[n] = 0;
   for(int bin=start; bin<(start+fRiseTime); bin++)
-    if( amp < hHist->Integral(bin, bin+fIntegrationWidth) )
+    if( fAmpl[n] < hHist->Integral(bin-fIntegrationWidth, bin+fIntegrationWidth) )
       {
-	amp = hHist->Integral(bin, bin+fIntegrationWidth);
-	maxbin = bin;
+	fAmpl[n] = hHist->Integral(bin-fIntegrationWidth, bin+fIntegrationWidth);
+	fAmplitude[n]->SetRange(bin-fIntegrationWidth-1, bin+fIntegrationWidth);
       }
 
-  start = maxbin -fIntegrationWidth/2;
-  stopp = maxbin +fIntegrationWidth/2;
-
-  fAmplitude[n]->SetRange( start, stopp );
-  hHist->Fit( fAmplitude[n], "+RQ0");
-
-  amp  = fAmplitude[n]->Eval(0);
-  amp -= fOffset[n]->Eval(0);
+  fAmpl[n]  = fAmpl[n]/(2*fIntegrationWidth+1);
+  fAmplitude[n]->SetParameter(0, fAmpl[n]);
+  fAmpl[n] -= fOffset[n]->Eval(0);
   
-  hSignalDist[n]->Fill(amp/scale);
+  hSignalDist[n]->Fill(fAmpl[n]/scale);
     
-  return amp;
+  return fAmpl[n];
+}
+
+//------------------------------------------------------------------------------
+void TPSignalExtractor::FillAmpVsDel()
+{
+  for(int i=0; i<(fNHits-1); i++)
+    fTime[i] = (lStopp[i+1]->GetX1() - lStopp[i]->GetX1())*0.002; // 500MS/s
+
+  for(int i=0;i<fNHits;i++)
+    {
+      hAmpVsDel[i]->Fill( fTime[i], 100);
+    }
 }

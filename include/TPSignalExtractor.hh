@@ -19,17 +19,18 @@
 
 #include <TPConstants.hh>
 
-using namespace std;
-
 class TPSignalExtractor
 {
 private:
   int fMaxHits; // maximum number of hits
   int fNHits;   // store number of hits
 
-  int fIntegrationWidth;
-  int fBaselineWidth;
-  int fRiseTime;
+  double fAmpl[MAX_NHITS];
+  Double_t fTime[MAX_NHITS];
+
+  int fBaselineWidth;     // used for baseline fit
+  int fIntegrationWidth;  // used for amplitude extraction for PreAmp
+  int fRiseTime;          // used for PreAmp signal risetime
 
 protected:
   //
@@ -66,6 +67,8 @@ public:
   // 
   //
   void FindHits(int, TH1D*);
+
+  void FillAmpVsDel();
 
   // Set's
   //

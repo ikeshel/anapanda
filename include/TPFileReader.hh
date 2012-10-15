@@ -32,8 +32,8 @@ protected:
   int fTotaEvt;     // total number of events in file
   int fTotaEvtPrc;  // 1% of total number of events
 
-  TH2I *h2D[   MAX_CHANNEL ];
-  TH1D *hProj[ MAX_CHANNEL ];
+  TH2I * h2D[   MAX_CHANNEL ];
+  TH1D * hProj[ MAX_CHANNEL ];
 
 public:
   TPFileReader();
