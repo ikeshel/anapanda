@@ -16,6 +16,7 @@
   bar->AddButton("Start",         ".x macros/start.C",     "Start 100ms");
   bar->AddButton("Stop",          ".x macros/stop.C",      "Stop");
   bar->AddButton("Draw On/Off",   ".x macros/DrawOnOff.C", "Stop");
+  bar->AddButton("Write Canvas",  "mm.WriteCanvas()",      "Write Canvas");
   bar->AddButton("Quit",          ".q",                    "Quit .q");
 
   bar->SetButtonWidth(300);

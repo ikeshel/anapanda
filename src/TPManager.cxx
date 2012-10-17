@@ -256,14 +256,26 @@ void TPManager::DrawAll()
 //------------------------------------------------------------------------------
 void TPManager::WriteCanvas()
 {
-  gSystem->Exec("mkdir -v pics");
+  // extract path and creat directory $path/pics 
+  //
+  TString strPath = fFile->GetName();
+  strPath.Remove( strPath.Last('/') );
+  strPath.Append("/pics/");
+  TString strNewDir = TString("mkdir -v "+strPath);
+  //printf("path : %s \n", strNewDir.Data() );
+  gSystem->Exec( strNewDir );
 
+  //
+  //
   TString strFileName = fFile->GetName();
-  strFileName.Remove( strFileName.Last('.')  );
+  strFileName.Remove( 0, strFileName.Last('/')+1 ); // remove path
+  strFileName.Remove( strFileName.Last('.') ); // remove extention
+  TString strOut = TString(strPath+strFileName);
+  //  printf("PNG : %s \n", TString(strOut+".png").Data() );
+  cMain->Print(TString(strOut+".png"));
 
-  printf("filename : %s \n", strFileName.Data() );
-
-  cMain->Print(strFileName.Append(".png"));
+  //  printf("ROOT : %s \n", TString(strOut+".root").Data() );
+  cMain->SaveAs(TString(strOut+".root"));
 
   return;
 }
