@@ -11,7 +11,7 @@
 ClassImp( TPManager )
 
 //------------------------------------------------------------------------------
-TPManager::TPManager()
+  TPManager::TPManager()
 {
   printf("  **************************************************** \n"
 	 "  *                                                  * \n"
@@ -88,12 +88,20 @@ void TPManager::DoEvent(int ev)
   for(int i=0; i<fNChannel; i++) // extract current event from 2D histo
     GetProjection(i, fCurrEvt);
   
-  if( ! hProj[0]->GetEntries() ) return; // 
+  if( ! hProj[0]->GetEntries() ) return; // if event is empty
 
   // set the start lines
   //
-  fSigExt_PMT->FindHits( GetConfigInt("PMT.Threshold"), hProj[0]);
+  fSigExt_PMT->FindHits( GetConfigInt("PMT.Threshold"), hProj[0] );
 
+  // time restriction
+  //
+  static int timelimit = GetConfigInt("Burst.MinDelay");
+  if( (fSigExt_PMT->GetStartLine(1)->GetX1() - fSigExt_PMT->GetStartLine(0)->GetX1()) < timelimit )
+    return;
+
+  // set the start lines
+  //
   for(int i=0; i<fSigExt_PMT->GetNumbOfHits(); i++)
     {
       fSigExt_AMP->SetStartLine( i, fSigExt_PMT->GetStartLine(i)->GetX1());
@@ -111,10 +119,32 @@ void TPManager::DoEvent(int ev)
 
   // fill time distributions
   //
-  fSigExt_PMT->FillAmpVsDel();
-  fSigExt_AMP->FillAmpVsDel();
-  fSigExt_SHP->FillAmpVsDel();
+  static double normPMT[]={20, 32};
+  static double normAMP[]={ 3, 5};
+  static double normSHP[]={19, 34};
+
+  if( fCurrEvt == 100 )
+    {
+      normPMT[0] = fSigExt_PMT->GetSignalDist(0)->GetMean();
+      normPMT[1] = fSigExt_PMT->GetSignalDist(1)->GetMean();
+      normAMP[0] = fSigExt_AMP->GetSignalDist(0)->GetMean();
+      normAMP[1] = fSigExt_AMP->GetSignalDist(1)->GetMean();
+      normSHP[0] = fSigExt_SHP->GetSignalDist(0)->GetMean();
+      normSHP[1] = fSigExt_SHP->GetSignalDist(1)->GetMean();
+    }
+  else if( fCurrEvt > 100 )
+    {
+      //   fSigExt_PMT->FillAmpVsDel();
+      //   fSigExt_AMP->FillAmpVsDel();
+      //   fSigExt_SHP->FillAmpVsDel();
+      
+      fSigExt_PMT->FillAmpVsDelNorm100(normPMT);
+      fSigExt_AMP->FillAmpVsDelNorm100(normAMP);
+      fSigExt_SHP->FillAmpVsDelNorm100(normSHP);
+    }
   
+  // Draw all histos
+  //
   if( fbDrawOnOff )
     if( !(fCurrEvt%fDrawScale) || fCurrEvt==0 )
       DrawAll();
@@ -194,8 +224,8 @@ void TPManager::DrawAll()
   
   cMain->cd(8);
   fSigExt_AMP->GetAmpVsDel(0)->Draw();
-  // for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
-  //   fSigExt_AMP->GetAmpVsDel(i)->Draw("same");
+  for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
+    fSigExt_AMP->GetAmpVsDel(i)->Draw("same");
 
   // Shp
   //
@@ -216,9 +246,24 @@ void TPManager::DrawAll()
   
   cMain->cd(9);
   fSigExt_SHP->GetAmpVsDel(0)->Draw();
-  // for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
-  //   fSigExt_SHP->GetAmpVsDel(i)->Draw("same");
+  for(int i=1; i<fSigExt_PMT->GetNumbOfHits(); i++)
+    fSigExt_SHP->GetAmpVsDel(i)->Draw("same");
 
   cMain->Update();  
   return;
 } 
+
+//------------------------------------------------------------------------------
+void TPManager::WriteCanvas()
+{
+  gSystem->Exec("mkdir -v pics");
+
+  TString strFileName = fFile->GetName();
+  strFileName.Remove( strFileName.Last('.')  );
+
+  printf("filename : %s \n", strFileName.Data() );
+
+  cMain->Print(strFileName.Append(".png"));
+
+  return;
+}

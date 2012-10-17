@@ -1,8 +1,5 @@
 
-# minimum distance between bursts
 #
-Burst.MinDelay:       500
-
 #
 #
 PMT.Threshold:        3000
@@ -10,12 +7,12 @@ PMT.BaselineWidth:    300
 PMT.IntegrationWidth: 50
 PMT.Scale:            7.7
 
-AMP.BaselineWidth:    200
-AMP.IntegrationWidth: 150
+AMP.BaselineWidth:    300
+AMP.IntegrationWidth: 80
 AMP.RiseTime:         500
 AMP.Scale:            1.0
 
-SHP.BaselineWidth:    200
+SHP.BaselineWidth:    300
 SHP.IntegrationWidth: 150
 SHP.Scale:            40
 

@@ -16,6 +16,7 @@
 #include <TTimer.h>
 #include <TCanvas.h>
 #include <TH1D.h>
+#include <TString.h>
 
 #include <TPConstants.hh>
 #include <TPConfig.hh>
@@ -58,6 +59,7 @@ public:
   //
   void Next();
   void DrawAll();
+  void WriteCanvas();
 
   // set
   //

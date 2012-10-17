@@ -24,10 +24,10 @@ using namespace std;
 class TPFileReader
 {
 private:
+protected:
   TFile  *fFile;
   Char_t szFileName[128];
 
-protected:
   int fNChannel;    // number of readout channel
   int fTotaEvt;     // total number of events in file
   int fTotaEvtPrc;  // 1% of total number of events
@@ -47,7 +47,6 @@ public:
   // Get's
   //
   TH2I* Get2DHisto(int i) { return h2D[i]; };
-  char* GetFileName()     { return szFileName; };
 
   TH1D* GetProjection(int,int);
 

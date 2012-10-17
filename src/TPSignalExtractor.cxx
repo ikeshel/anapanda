@@ -34,7 +34,7 @@ ClassImp( TPSignalExtractor )
       //
       sprintf(szName, "%s_AmVsDt_%i", name, i);
       hAmpVsDel[i] = new TH2D( szName, ";Delay [#mus];Norm. Amp. [%]", 
-			       105, 0., 10.5,   100, 90, 110);
+			       105, 0., 10.5,   100, 80, 120);
       hAmpVsDel[i]->SetMarkerColor(myColor[i]);
 
 
@@ -162,7 +162,7 @@ double TPSignalExtractor::GetIntegral(int n, TH1D* hHist, double scale)
   // |          |    width    |   offse
   // |        start          stop
 
-  if( !hHist->GetEntries() ) return 0;
+  //  if( !hHist->GetEntries() ) return 0;
 
   static int start;
   static int stopp;
@@ -183,12 +183,13 @@ double TPSignalExtractor::GetIntegral(int n, TH1D* hHist, double scale)
   lStopp[n]->SetX1(stopp); // stop line
   lStopp[n]->SetX2(stopp);
   
-  double amp = ( fOffset[n]->Integral(start, stopp) - 
-		 hHist->Integral(start, stopp) );
+  fAmpl[n] = ( fOffset[n]->Integral(start, stopp) - 
+	       hHist->Integral(start, stopp) );
 
-  hSignalDist[n]->Fill(amp/scale);
+  fAmpl[n] /= scale;
+  hSignalDist[n]->Fill(fAmpl[n]);
     
-  return amp;
+  return fAmpl[n];
 }
 
 //------------------------------------------------------------------------------
@@ -197,12 +198,11 @@ double TPSignalExtractor::GetAmplitude(int n, TH1D* hHist, double scale)
   /*
   // ^     a2  __
   // |  a1 __    |\
-  // |       |\  |  \
-  // |       |  \|   \
-  // |_______|         \________
-  // ___________________________________>
+  // |       |\  | \
+  // |       |  \|  \
+  // |_______|       \________
+  // ______________________________>
   */
-
   if( !hHist->GetEntries() ) return 0;
 
   static int start;
@@ -230,16 +230,18 @@ double TPSignalExtractor::GetAmplitude(int n, TH1D* hHist, double scale)
   
   // finding the maximum
   //
-  start += fIntegrationWidth;   
-  fAmpl[n] = 0;
-  for(int bin=start; bin<(start+fRiseTime); bin++)
-    if( fAmpl[n] < hHist->Integral(bin-fIntegrationWidth, bin+fIntegrationWidth) )
-      {
-	fAmpl[n] = hHist->Integral(bin-fIntegrationWidth, bin+fIntegrationWidth);
-	fAmplitude[n]->SetRange(bin-fIntegrationWidth-1, bin+fIntegrationWidth);
-      }
-
-  fAmpl[n]  = fAmpl[n]/(2*fIntegrationWidth+1);
+  static double amp;
+  for(int bin=start; bin<(stopp-fIntegrationWidth); bin++)
+    {
+      amp = hHist->Integral(bin, bin+fIntegrationWidth);
+      if( fAmpl[n] < amp )
+	{
+	  fAmpl[n] = amp;
+	  fAmplitude[n]->SetRange(bin-1, bin+fIntegrationWidth);
+	}
+    }
+  
+  fAmpl[n]  = fAmpl[n]/(fIntegrationWidth+1);
   fAmplitude[n]->SetParameter(0, fAmpl[n]);
   fAmpl[n] -= fOffset[n]->Eval(0);
   
@@ -251,11 +253,36 @@ double TPSignalExtractor::GetAmplitude(int n, TH1D* hHist, double scale)
 //------------------------------------------------------------------------------
 void TPSignalExtractor::FillAmpVsDel()
 {
-  for(int i=0; i<(fNHits-1); i++)
-    fTime[i] = (lStopp[i+1]->GetX1() - lStopp[i]->GetX1())*0.002; // 500MS/s
+  // in case of only 2 hits !!!
+  //
+  fTime[0] = (lStopp[0+1]->GetX1() - lStopp[0]->GetX1())*0.002; // 500MS/s
+  hAmpVsDel[0]->Fill( fTime[0], fAmpl[0]);
+  hAmpVsDel[1]->Fill( fTime[0], fAmpl[1]);
 
-  for(int i=0;i<fNHits;i++)
-    {
-      hAmpVsDel[i]->Fill( fTime[i], 100);
-    }
+  // printf(" hAmpVsDel : %f  %f  %f \n", fTime[0], fAmpl[0], fAmpl[1]);
+
+  return;
+}
+
+//------------------------------------------------------------------------------
+void TPSignalExtractor::FillAmpVsDelNorm100(double * norm)
+{
+  // in case of only 2 hits !!!
+  //
+  fTime[0] = (lStopp[0+1]->GetX1() - lStopp[0]->GetX1())*0.002; // 500MS/s
+  hAmpVsDel[0]->Fill( fTime[0], fAmpl[0]/norm[0]*100);
+  hAmpVsDel[1]->Fill( fTime[0], fAmpl[1]/norm[1]*100);
+
+  // printf(" hAmpVsDel : %f  %f  %f \n", fTime[0], fAmpl[0], fAmpl[1]);
+
+  //
+  //
+//   for(int i=0; i<(fNHits-1); i++)
+//     fTime[i] = (lStopp[i+1]->GetX1() - lStopp[i]->GetX1())*0.002; // 500MS/s
+
+//   for(int i=0;i<fNHits;i++)
+//     {
+//       hAmpVsDel[i]->Fill( fTime[i], 100);
+//     }
+  return;
 }

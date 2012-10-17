@@ -69,6 +69,7 @@ public:
   void FindHits(int, TH1D*);
 
   void FillAmpVsDel();
+  void FillAmpVsDelNorm100(double*);
 
   // Set's
   //
