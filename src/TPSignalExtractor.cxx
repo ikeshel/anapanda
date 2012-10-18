@@ -25,7 +25,7 @@ ClassImp( TPSignalExtractor )
       // signal distribution histo
       //
       sprintf(szName, "%s_%i", name, i);
-      hSignalDist[i] = new TH1D(szName, "", 4100, 0, 4100);
+      hSignalDist[i] = new TH1D(szName, "", 15000, 0, 15000);
       hSignalDist[i]->SetStats(0);
       hSignalDist[i]->SetLineColor(myColor[i]+2);
       hSignalDist[i]->SetFillColor(myColor[i]);
@@ -241,11 +241,15 @@ double TPSignalExtractor::GetAmplitude(int n, TH1D* hHist, double scale)
 	}
     }
   
-  fAmpl[n]  = fAmpl[n]/(fIntegrationWidth+1);
-  fAmplitude[n]->SetParameter(0, fAmpl[n]);
-  fAmpl[n] -= fOffset[n]->Eval(0);
+  //  fAmpl[n]  = fAmpl[n]/(fIntegrationWidth+1);
+  fAmpl[n]  = fAmpl[n];
+  fAmplitude[n]->SetParameter(0, fAmpl[n]/(fIntegrationWidth+1));
+
+  //  fAmpl[n] -= fOffset[n]->Eval(0);
+  fAmpl[n] = fAmpl[n]-fOffset[n]->Eval(0)*(fIntegrationWidth+1);
   
-  hSignalDist[n]->Fill(fAmpl[n]/scale);
+  fAmpl[n] /= scale;
+  hSignalDist[n]->Fill(fAmpl[n]);
     
   return fAmpl[n];
 }
